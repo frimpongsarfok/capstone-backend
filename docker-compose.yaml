@@ -1,0 +1,20 @@
+#blueprint for full app
+
+version: "3"
+services: 
+  db:
+    image: `postgres`
+     volumes:
+     #where data will live -> create blank volume that gives an area for all the data to live in
+     #superuser flags? if we need to keep ownership 
+      - ./my_data_directory:/var/lib/postgresql/data
+  server:
+    build: ./server
+  # frontend:
+  #   build: ./react_client
+
+
+  #docker compose up - everything that your user needs to start up
+  #init server, point to all the microservices that are needed to run
+
+  BRANDON -> do git add . ; git commit -m; and git push
