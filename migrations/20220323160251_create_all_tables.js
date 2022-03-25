@@ -16,16 +16,16 @@
     }).
     createTable('projects', table => {
         table.increments('id');
-         table.string('name');
+         table.string('name').notNullable();
          table.timestamps(true,true);
      }).
      createTable('users_projects', table => {
         table.increments('id');
-         table.integer('users_id');
-         table.integer('projects_id');
-         table.integer('permission');
-         table.foreign('users_id').references('id').inTable('users').onDelete('cascade')
-         table.foreign('projects_id').references('id').inTable('projects').onDelete('cascade')
+         table.integer('user_id').notNullable();
+         table.integer('project_id').notNullable();
+         table.integer('permission').notNullable();
+         table.foreign('user_id').references('id').inTable('users').onDelete('cascade')
+         table.foreign('project_id').references('id').inTable('projects').onDelete('cascade')
          
      }).
 
@@ -33,29 +33,29 @@
 
      createTable('products', table => {
         table.increments('id');
-        table.string('name');
-        table.boolean('completed');
-        table.integer('projects_id');
+        table.string('name').notNullable();
+        table.boolean('completed').defaultTo(false);
+        table.integer('project_id').notNullable();
         table.timestamps(true,true);
-        table.foreign('projects_id').references('id').inTable('projects').onDelete('cascade')
+        table.foreign('project_id').references('id').inTable('projects').onDelete('cascade')
      }).
 
      createTable('list', table => {
         table.increments('id');
-        table.string('name')
-        table.boolean('completed');
-        table.integer('products_id');
+        table.string('name').notNullable();
+        table.boolean('completed').defaultTo(false);
+        table.integer('product_id').notNullable();;
         table.timestamps(true,true);
-        table.foreign('products_id').references('id').inTable('products').onDelete('cascade')
+        table.foreign('product_id').references('id').inTable('products').onDelete('cascade')
      })
      .createTable('card', table => {
          table.increments('id');
-        table.text('name');
+        table.text('name').notNullable();
         table.string('tags');
         table.integer('points_value');
         table.date('due_date')
-        table.boolean('completed');
-        table.integer('list_id');
+        table.boolean('completed').defaultTo(false);
+        table.integer('list_id').notNullable();
         table.foreign('list_id').references('id').inTable('list').onDelete('cascade')
         table.timestamps(true,true);
     })

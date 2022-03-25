@@ -1,4 +1,4 @@
-
+const bcrypt=require('bcrypt')
 /**
  *
  * @param { import("knex").Knex } knex
@@ -6,11 +6,19 @@
  */
 exports.seed = async function(knex) {
   // Deletes ALL existing entries
+
+  const password='password'
+   let new_password=null;
+ const saltRounds=10;
+   bcrypt.hash(password, saltRounds, function(err, hash) {
+  err?console.log(err):new_password=hash;
+  });
+
   await knex('users').del()
   await knex('users').insert([
-    { username: 'username',password: 'password',fname: 'Rocco',lname: 'Patrick',email: 'rocco@rpatrick.com'}
+    { username: 'username',password: new_password,fname: 'Rocco',lname: 'Patrick',email: 'rocco@rpatrick.com'}
   ]);
-
+  
   await knex('projects').del()
   await knex('projects').insert([
     { name: 'Army Dashboard'},
@@ -18,17 +26,19 @@ exports.seed = async function(knex) {
 
   await knex('users_projects').del()
   await knex('users_projects').insert([
-    { users_id:1,projects_id:1, permission: 1},
+    { user_id:1,project_id:1, permission: 1},
   ]);
 
   await knex('products').del()
   await knex('products').insert([
-    { name: 'Training Calender',completed: true,projects_id: 1},
+    { name: 'Training Calender',completed: true,project_id: 1},
   ]);
 
   await knex('list').del()
   await knex('list').insert([
-    {name:'Todo', completed: false,products_id: 1,name:'Doing', completed: false, products_id: 1,name:'Done',completed: false, products_id: 1},
+    {name:'Todo', completed: false,product_id: 1},
+    {name:'Doing', completed: false, product_id: 1},
+    {name:'Done',completed: false, product_id: 1},
   ]);
   
   await knex('card').del()
