@@ -1,21 +1,27 @@
-#blueprint for each dependencies, etc
+FROM postgres:14.1-alpine
+# what image to base off of - references a Dockerfile to automate the build process
 
-FROM postgres
-#where it is on dockerhub image
-WORKDIR 
-#create a path where it can copy into docker files - can add bash flags ex chmod
-COPY * *
-#from local files
-RUN
-# can have multiple run (ex npm install)
+RUN npm i express pg knex
+# RUN git clone 
+RUN npx knex migrate:latest
+RUN npx knex seed:run
+# what runs within the container at build time - can have multiple
+
+VOLUME var/lib/postgresql/data
+#specifying it in the dockerfile allows it to be externally mounted via the host itself or a docker data container 
+# if it is not defined here it is not possible to access outside of the container
+
+ENV
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=docker
+# sets environment variables which can be used in the Dockerfile and any scripts that it calls
+
+COPY 
+# can copy a file in the same directory as the dockerfile to the container
+
+ENTRYPOINT
+# if not specified, docker will ise /bin/sh -c as default
+#can be used to override some of the system defaults
+
 CMD
-# can only have one - npm start // closes off docker process and starts app
-
-# Build an image starting with the Python 3.7 image.
-# Set the working directory to /code.
-# Set environment variables used by the flask command.
-# Install gcc and other dependencies
-# Copy requirements.txt and install the Python dependencies.
-# Add metadata to the image to describe that the container is listening on port 5000
-# Copy the current directory . in the project to the workdir . in the image.
-# Set the default command for the container to flask run.
+#default argument passed to entrypoint

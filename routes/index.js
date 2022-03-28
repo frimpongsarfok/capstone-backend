@@ -6,6 +6,128 @@ var router = express.Router();
 const saltRounds=10;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
 
+
+
+
+//INVITE USER
+router.post('/invite',(req,res)=>{
+   //check if user is login
+   const {username,password}=req.cookies;
+   if(!username||!password){
+    res.status(404).json({status:403,msg:'login required'})
+    return;
+  }
+  const {new_user_permission, new_user_id, project_id}=req.query;
+  
+  if(!project_id || !new_user_id || !new_user_permission){
+    res.status(404).json({status:404,msg:'fields required (new user id, permission, project id).'})
+    return;
+  }
+  //check if param are provided
+   //check if user is admin or super -admin
+   knex.raw(`SELECT users_projects.permission as permission from users_projects 
+            JOIN users on (users.id=users_projects.user_id) where users.username='${username}' and users_projects.project_id='${project_id}'`).then(msg=>{
+
+        
+    const {permission} = msg.rows[0];
+    
+    if(permission != 1&&permission != 2){
+      res.status(404).json({status:403,msg:'access denied'})
+      return;
+    }
+    
+   
+    knex('users_projects').insert({user_id:new_user_id, permission:new_user_permission, project_id:project_id}).then(status=>{
+     res.json({status:201,msg:'Added Successful'});
+   }).catch(err=>err.code==='23503'?res.json({msg:'user does not exist.'}):res.status(401).json(err))
+     //   if true
+     //      add new user invited to users_projects table
+              // responed add or fail if user
+   }).catch(err=>res.status(400).send(err));
+ 
+});
+
+//DELETE USER
+router.delete('/remove_user_from_project',(req,res)=>{
+  //check if user is login
+  const {username,password}=req.cookies;
+  if(!username||!password){
+   res.status(404).json({status:403,msg:'login required'})
+   return;
+ }
+ const {user_id, project_id}=req.query;
+ 
+ if(!project_id || !user_id){
+   res.status(404).json({status:404,msg:'fields required (new user id, project id).'})
+   return;
+ }
+ //check if param are provided
+  //check if user is admin or super -admin
+  knex.raw(`SELECT users_projects.permission as permission from users_projects 
+           JOIN users on (users.id=users_projects.user_id) where users.username='${username}' and users_projects.project_id='${project_id}'`).then(msg=>{
+
+       
+   const {permission} = msg.rows[0];
+   
+   if(permission != 1&&permission != 2){
+     res.status(404).json({status:403,msg:'access denied'})
+     return;
+   }
+   
+  
+   knex('users_projects').where({user_id:user_id, project_id:project_id}).del().then(status=>{
+    res.json({status:201,msg:'Removed Successfully'});
+  }).catch(err=>err.code==='23503'?res.json({msg:'user does not exist.'}):res.status(401).json(err))
+    //   if true
+    //      add new user invited to users_projects table
+             // responed add or fail if user
+  }).catch(err=>res.status(400).send(err));
+
+});
+
+//UPDATE PERMISSION
+router.patch('/update_user_permission',(req,res)=>{
+  //check if user is login
+  const {username,password}=req.cookies;
+  if(!username||!password){
+   res.status(404).json({status:403,msg:'login required'})
+   return;
+ }
+ const {user_id, project_id, new_permission}=req.query;
+ 
+ if(!project_id || !user_id || !new_permission){
+   res.status(404).json({status:404,msg:'fields required ( user id, project id, new permission).'})
+   return;
+ }
+ //check if param are provided
+  //check if user is admin or super -admin
+  knex.raw(`SELECT users_projects.permission as permission from users_projects 
+           JOIN users on (users.id=users_projects.user_id) where users.username='${username}' and users_projects.project_id='${project_id}'`).then(msg=>{
+
+       
+
+   if(!msg.rows.length){
+    res.status(404).json({status:403,msg:'user does not exist'})
+    return;
+   }
+   const {permission} = msg.rows[0];
+
+   if((new_permission <permission) ||permission>=3 ){
+     res.status(404).json({status:403,msg:'access denied'})
+     return;
+   }
+   
+  
+   knex('users_projects').update({permission:new_permission}).where({user_id:user_id, project_id:project_id}).then(status=>{
+    res.json({status:201,msg:'Permission Updated Successfully'});
+  }).catch(err=>err.code==='23503'?res.json({msg:'user does not exist.'}):res.status(401).json(err))
+    //   if true
+    //      add new user invited to users_projects table
+             // responed add or fail if user
+  }).catch(err=>res.status(400).send(err));
+
+});
+
 //LOGIN CRUD
 //Create Account
 router.post('/signup', function(req, res, next) {
@@ -23,7 +145,7 @@ router.post('/signup', function(req, res, next) {
       .cookie('password',password)
       .status(201)
       .json({status:201,msg:'Added Successful'});
-   }).catch(err=>res.status(401).json(err))
+   }).catch(err=>err.code==='23505'?res.status(401).json({msg:'user already exist'}):res.status(401).json(err))
  });
 });
 
@@ -44,6 +166,7 @@ router.get('/login', function(req, res, next) {
         
     if(!rows.length){
       res.status(400).json({msg:'username not found'});
+      return;
     }else{
       const pwd=rows[0].password;
   
@@ -120,16 +243,24 @@ router.get('/users', function(req, res, next) {
   const {username,password}=req.cookies;
   console.log(username);
   if(!username||!password){
-    res.status(404).json({msg:'hey login before!!!'})
+    res.status(404).json({msg:'login required'})
     return;
   }
-   const {id}=req.query;
-    id?knex('users').where({id:id}).then(rows=>{
-      res.status(200).json(rows);
-   }).catch(err=>res.status(400).send(err)):
-    knex('users').then(rows=>{
-       res.status(200).json(rows);
-    }).catch(err=>res.status(400).send(err));
+   const {user}=req.query;
+  if(!username){
+    res.status(404).json({status:404,msg:'username required'})
+    return;
+  }
+    knex('users').where({username:user}).then(rows=>{
+      if(!rows.length){
+        res.status(404).json({msg:"user does not exist."});
+        return;
+      }
+       const user={...rows[0]};
+       delete user.password;
+       res.status(200).json(user);  
+   }).catch(err=>res.status(400).send(err))
+  
   
 });
 
@@ -211,15 +342,15 @@ router.get('/projects', function(req, res, next) {
     return;
   }    
     knex.raw(`
-       SELECT projects.id,projects.created_at,projects.updated_at,projects.name 
+       SELECT projects.id,projects.created_at,projects.updated_at,projects.name,users_projects.permission  
        FROM projects 
        JOIN users_projects
         ON (projects.id=users_projects.project_id) 
         JOIN users 
         ON (users.id=users_projects.user_id) 
         where users.username='${username}';
-    `).then(rows=>{
-      res.status(200).json(results.rows);
+    `).then(msg=>{
+      res.status(200).json(msg.rows);
    }).catch(err=>res.status(400).send(err));
   
 });
