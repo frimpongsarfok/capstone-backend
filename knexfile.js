@@ -23,16 +23,12 @@
   },
 
   production: {
-    client: 'pg',
-    connection: {
-      database: 'postgres://postgres:docker@localhost:5432/capstone',
-      user:     'username',
-      password: 'password'
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
+   
+   
+   client: 'pg',
+    debug: true,
+    connection: 'postgres://ksiqbcqujvgwbn:77f9cedb6bcb42e9060de88b72e29418ab7b709e05675a76e4fc4ef78913f55d@ec2-54-173-77-184.compute-1.amazonaws.com:5432/d1f9ab1ufksiac',
+    ssl: true,
     migrations: {
       tableName: 'knex_migrations'
     }
