@@ -9,7 +9,10 @@ const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || '
 
 
 
+
 //INVITE USER
+
+router.get('/',(req,res)=>res.send('<h1  >Code-Talker API</h1>'))
 router.post('/invite',(req,res)=>{
    //check if user is login
    const {username,password}=req.cookies;
@@ -153,23 +156,24 @@ router.post('/signup', function(req, res, next) {
 //Read | Login in Account
 router.get('/login', function(req, res, next) {
   const {username,password}=req.query;
+  console.log(username,password)
+  res.header('Access-Control-Allow-Origin','http://localhost:3000')
+  .header('Access-Control-Allow-Credentials', true)
   if(!username|| !password){
      res.status(400).json({msg:'provide username and password'});
      return;
   }
 
-  res.setHeader("Access-Control-Allow-Origin","*");
-  res.setHeader( 'Content-Type','application/json');
+
 
 
   knex('users').where({username:username}).then(rows=>{
         
     if(!rows.length){
-      res.status(400).json({msg:'username not found'});
+      res.status(401).json({msg:'username not found'});
       return;
     }else{
       const pwd=rows[0].password;
-  
       bcrypt.compare(password, pwd).then(function(result) {
         if(result){
           const user={...rows[0]};
@@ -178,6 +182,7 @@ router.get('/login', function(req, res, next) {
           cookie('password',user.password).
           status(200).json(user);
         }else{
+         
           res.status(400).json({msg:'hey password incorrect'});
         }
       });
@@ -215,7 +220,10 @@ router.put('/account', function(req, res, next) {
     const query={...req.query};
     query.password=hash;
     knex('users').update(query).where({username:oldUsername}).then(status=>{
-      res.cookie('username',username)
+
+      res.clearCookie('username')
+      .clearCookie('password')
+      .cookie('username',username)
       .cookie('password',password)
       .status(201)
       .json({status:201,msg:'Updated Successful'});
