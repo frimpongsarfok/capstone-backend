@@ -6,7 +6,7 @@ var router = express.Router();
 const saltRounds=10;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
 //INVITE USER
-const clientAddress='http://localhost:3000'
+const clientAddress='https://capstone-sdio8-codetalkers.herokuapp.com'
 router.get('/',(req,res)=>res.send('<h1  >Code-Talker API</h1>'))
 router.post('/invite',(req,res)=>{
   res.header('Access-Control-Allow-Origin',clientAddress)
