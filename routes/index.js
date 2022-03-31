@@ -5,15 +5,12 @@ const bcrypt=require('bcrypt');
 var router = express.Router();
 const saltRounds=10;
 const knex = require('knex')(require('../knexfile.js')[process.env.NODE_ENV || 'development']);
-
-
-
-
-
 //INVITE USER
-
+const clientAddress='http://localhost:3000'
 router.get('/',(req,res)=>res.send('<h1  >Code-Talker API</h1>'))
 router.post('/invite',(req,res)=>{
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
    //check if user is login
    const {username,password}=req.cookies;
    if(!username||!password){
@@ -52,6 +49,8 @@ router.post('/invite',(req,res)=>{
 
 //DELETE USER
 router.delete('/remove_user_from_project',(req,res)=>{
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   //check if user is login
   const {username,password}=req.cookies;
   if(!username||!password){
@@ -90,6 +89,8 @@ router.delete('/remove_user_from_project',(req,res)=>{
 
 //UPDATE PERMISSION
 router.patch('/update_user_permission',(req,res)=>{
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   //check if user is login
   const {username,password}=req.cookies;
   if(!username||!password){
@@ -134,7 +135,9 @@ router.patch('/update_user_permission',(req,res)=>{
 //LOGIN CRUD
 //Create Account
 router.post('/signup', function(req, res, next) {
-
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
+  
   const {password,username}=req.query;
   if(!password||!username){
       res.status(401).json({msg:'username and password required'})
@@ -147,7 +150,7 @@ router.post('/signup', function(req, res, next) {
       res.cookie('username',username)
       .cookie('password',password)
       .status(201)
-      .json({status:201,msg:'Added Successful'});
+      .json(query);
    }).catch(err=>err.code==='23505'?res.status(401).json({msg:'user already exist'}):res.status(401).json(err))
  });
 });
@@ -155,10 +158,11 @@ router.post('/signup', function(req, res, next) {
 
 //Read | Login in Account
 router.get('/login', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
+
   const {username,password}=req.query;
   console.log(username,password)
-  res.header('Access-Control-Allow-Origin','http://localhost:3000')
-  .header('Access-Control-Allow-Credentials', true)
   if(!username|| !password){
      res.status(400).json({msg:'provide username and password'});
      return;
@@ -201,6 +205,8 @@ router.get('/login', function(req, res, next) {
 
 //UPDATE | Update User Account
 router.put('/account', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   console.log(username);
   if(!username||!password){
@@ -233,6 +239,8 @@ router.put('/account', function(req, res, next) {
 
 //DELETE | Delete Users
 router.delete('/deleteAccount', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   console.log(req.query);
   const {username,password}=req.cookies;
   if(!username||!password){
@@ -247,7 +255,8 @@ router.delete('/deleteAccount', function(req, res, next) {
 });
 //for seaching for users
 router.get('/users', function(req, res, next) {
- 
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   console.log(username);
   if(!username||!password){
@@ -273,7 +282,8 @@ router.get('/users', function(req, res, next) {
 });
 
 router.get('/logout', function(req, res, next) {
-   
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
    res.clearCookie('username').clearCookie('password').
     status(200).json({msg:'logout successful'})
 });
@@ -282,6 +292,8 @@ router.get('/logout', function(req, res, next) {
 
 
 router.get('/users/:command', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
  
   if(!username||!password){
@@ -328,6 +340,8 @@ router.get('/users/:command', function(req, res, next) {
 //Create
 
 router.post('/projects', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({msg:'hey login before!!!'})
@@ -342,7 +356,8 @@ router.post('/projects', function(req, res, next) {
 
 //Read
 router.get('/projects', function(req, res, next) {
- 
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   console.log(username);
   if(!username||!password){
@@ -365,7 +380,8 @@ router.get('/projects', function(req, res, next) {
 
 //update
 router.patch('/projects', function(req, res, next) {
-
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({status:404,msg:'login required'})
@@ -384,7 +400,8 @@ router.patch('/projects', function(req, res, next) {
 });
 //delete
 router.delete('/projects', function(req, res, next) {
-
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({status:404,msg:'login required'})
@@ -404,6 +421,8 @@ router.delete('/projects', function(req, res, next) {
 
 //create products
 router.post('/products', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({msg:'hey login before!!!'})
@@ -421,6 +440,8 @@ router.post('/products', function(req, res, next) {
 
 //Read products
 router.get('/products', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({msg:'hey login before!!!'})
@@ -435,6 +456,8 @@ router.get('/products', function(req, res, next) {
   }
 
   knex('products').where({id:project_id}).then(rows=>{
+    res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
     res.status(200).json(rows);
  }).catch(err=>res.status(401).send(err))
   });
@@ -442,7 +465,8 @@ router.get('/products', function(req, res, next) {
 //Update products
 
 router.patch('/products', function(req, res, next) {
-
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({status:404,msg:'login required'})
@@ -463,7 +487,8 @@ router.patch('/products', function(req, res, next) {
 //delete products
 
 router.delete('/products', function(req, res, next) {
-
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({status:404,msg:'login required'})
@@ -484,6 +509,8 @@ router.delete('/products', function(req, res, next) {
 //Create list
 
 router.post('/list', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({msg:'hey login before!!!'})
@@ -502,6 +529,8 @@ router.post('/list', function(req, res, next) {
 // read list
 
 router.get('/list', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
   const {username,password}=req.cookies;
   if(!username||!password){
     res.status(404).json({msg:'hey login before!!!'})
@@ -524,7 +553,8 @@ router.get('/list', function(req, res, next) {
   //Update list
 
   router.patch('/list', function(req, res, next) {
-
+    res.header('Access-Control-Allow-Origin',clientAddress)
+    .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({status:404,msg:'login required'})
@@ -543,7 +573,8 @@ router.get('/list', function(req, res, next) {
   });
 
   router.delete('/list', function(req, res, next) {
-
+    res.header('Access-Control-Allow-Origin',clientAddress)
+    .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({status:404,msg:'login required'})
@@ -564,6 +595,8 @@ router.get('/list', function(req, res, next) {
   //create card
 
   router.post('/card', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({msg:'hey login before!!!'})
@@ -582,6 +615,8 @@ router.get('/list', function(req, res, next) {
   // read card 
 
   router.get('/card', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin',clientAddress)
+  .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({msg:'hey login before!!!'})
@@ -603,7 +638,8 @@ router.get('/list', function(req, res, next) {
     //Update card
 
   router.patch('/card', function(req, res, next) {
-
+    res.header('Access-Control-Allow-Origin',clientAddress)
+    .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({status:404,msg:'login required'})
@@ -622,7 +658,8 @@ router.get('/list', function(req, res, next) {
   });
 
   router.delete('/card', function(req, res, next) {
-
+    res.header('Access-Control-Allow-Origin',clientAddress)
+    .header('Access-Control-Allow-Credentials', true)
     const {username,password}=req.cookies;
     if(!username||!password){
       res.status(404).json({status:404,msg:'login required'})
