@@ -1,4 +1,3 @@
-
 const { round } = require('cli-boxes');
 var express = require('express');
 const url=require('url')
@@ -640,8 +639,6 @@ router.get('/list', function(req, res, next) {
   
     
   });
-
-  module.exports=router;
 // router.get('/tasks', function(req, res, next) {
 //   const {username,password}=req.cookies;
 //   if(!username||!password){
@@ -777,5 +774,7 @@ bcrypt.hash(myPlaintextPassword, saltRounds).then(function(hash) {
 bcrypt.compare(myPlaintextPassword, hash).then(function(result) {
     // result == true
 });
+
 */
 
+module.exports = router;
