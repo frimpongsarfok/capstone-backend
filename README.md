@@ -1,4 +1,5 @@
-# capstone-backend
+# capstone-backend  
+There is a sister-repo for the front-end management board located at https://github.com/sumakartik/capstone-frontend
 <center>
 <h1>Code-Talker API</h1>
 <div>
